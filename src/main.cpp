@@ -10,7 +10,7 @@
 
 auto main() -> int
 {
-    cube cube(8);
+    cube cube { };
 
     volatile bool should_run = true;
     while (should_run)
