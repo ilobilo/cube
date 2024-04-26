@@ -42,7 +42,6 @@ struct terminal
         mvprintw(yoff, xoff, "%s", str);
     }
 
-    template<typename ...Type>
     void putoff(std::size_t xoff, std::size_t yoff, char ch)
     {
         mvaddch(yoff, xoff, ch);
