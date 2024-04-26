@@ -1,6 +1,7 @@
-// Copyright (0.01f) 2024 ilobilo
+// Copyright (C) 2024 ilobilo
 
 #include <cube.hpp>
+#include <optional>
 #include <cstddef>
 
 #include <glm/gtc/quaternion.hpp>
@@ -27,19 +28,20 @@ void cube::rotate(float deg, glm::vec3 axis)
         point = rotate_vector(deg, axis, point);
 }
 
-void cube::draw()
+std::pair<ssize_t, ssize_t> cube::getstarts()
 {
-    this->term.clear();
-
     const auto width = this->term.width();
     const auto height = this->term.height();
 
-    const auto startx = (width / (2 * cube::nx_chars));
-    const auto starty = (height / (2 * cube::ny_chars));
+    return { (width / (2 * cube::nx_chars)), (height / (2 * cube::ny_chars)) };
+}
 
+bool cube::draw()
+{
+    auto [startx, starty] = this->getstarts();
     glm::vec2 pos[8];
 
-    auto getxy = [&](glm::vec3 vec)
+    auto getxy = [&](glm::vec3 vec) -> std::optional<glm::vec2>
     {
         auto projected = cube::proj_matrix * vec;
         auto x = static_cast<ssize_t>(projected.x) + startx;
@@ -48,7 +50,6 @@ void cube::draw()
         x *= cube::nx_chars;
         y *= cube::ny_chars;
 
-        assert(y < height && x < width);
         return glm::vec2 { x, y };
     };
 
@@ -59,6 +60,71 @@ void cube::draw()
 
         auto x1 = end.x;
         auto y1 = end.y;
+
+        // auto draw_low = [this](float x0, float y0, float x1, float y1)
+        // {
+        //     auto dx = x1 - x0;
+        //     auto dy = y1 - y0;
+
+        //     auto yi = 1.f;
+        //     if (dy < 0)
+        //     {
+        //         yi = -1;
+        //         dy = -dy;
+        //     }
+        //     auto D = (2 * dy) - dx;
+        //     auto y = y0;
+        //     for (auto x = x0; x < x1; x++)
+        //     {
+        //         this->term.printoff(x, y, cube::hchar);
+        //         if (D > 0)
+        //         {
+        //             y += yi;
+        //             D += 2 * (dy - dx);
+        //         }
+        //         else D += 2 * dy;
+        //     }
+        // };
+
+        // auto draw_high = [this](float x0, float y0, float x1, float y1)
+        // {
+        //     auto dx = x1 - x0;
+        //     auto dy = y1 - y0;
+
+        //     auto xi = 1.f;
+        //     if (dx < 0)
+        //     {
+        //         xi = -1;
+        //         dx = -dx;
+        //     }
+        //     auto D = (2 * dx) - dy;
+        //     auto x = x0;
+        //     for (auto y = y0; y < y1; y++)
+        //     {
+        //         this->term.printoff(x, y, cube::hchar);
+        //         if (D > 0)
+        //         {
+        //             x += xi;
+        //             D += 2 * (dx - dy);
+        //         }
+        //         else D += 2 * dx;
+        //     }
+        // };
+
+        // if (glm::abs(y1 - y0) < glm::abs(x1 - x0))
+        // {
+        //     if (x0 > x1)
+        //         draw_low(x1, y1, x0, y0);
+        //     else
+        //         draw_low(x0, y0, x1, y1);
+        // }
+        // else
+        // {
+        //     if (y0 > y1)
+        //         draw_high(x1, y1, x0, y0);
+        //     else
+        //         draw_high(x0, y0, x1, y1);
+        // }
 
         auto dx = x1 - x0;
         auto dy = y1 - y0;
@@ -94,7 +160,12 @@ void cube::draw()
     };
 
     for (size_t i = 0; const auto &point : this->vertices)
-        pos[i++] = getxy(point);
+    {
+        auto ret = getxy(point);
+        if (ret.has_value() == false)
+            return false;
+        pos[i++] = ret.value();
+    }
 
     /*
      *    5-----4
@@ -104,6 +175,8 @@ void cube::draw()
      *  |/    |/
      *  2-----3
     */
+
+    this->term.clear();
 
     draw_line(pos[1], pos[0]);
     draw_line(pos[0], pos[3]);
@@ -121,26 +194,22 @@ void cube::draw()
     draw_line(pos[3], pos[7]);
 
     this->term.refresh();
+
+    return true;
 }
 
-cube::cube(ssize_t size) : term(), size(size),
-    vertices {
-        { -size, -size,  size },
-        {  size, -size,  size },
-        {  size,  size,  size },
-        { -size,  size,  size },
-        { -size, -size, -size },
-        {  size, -size, -size },
-        {  size,  size, -size },
-        { -size,  size, -size },
-    }
+cube::cube(ssize_t size) : term(), size(size)
 {
-    assert(this->size > 0);
-    assert(this->size < this->term.width());
-    assert(this->size < this->term.height());
+    // does this work properly?
+    ssize_t maxsize = ((static_cast<float>(glm::min(this->term.height(), this->term.width())) / cube::ny_chars) / glm::sqrt(3)) / 2;
+    if (this->size <= 0 || this->size > maxsize)
+        this->size = maxsize;
 
-    for (auto &point : vertices)
+    this->term.refresh();
+
+    for (std::size_t i = 0; auto &point : vertices)
     {
+        point = cube::default_verticies[i++] * static_cast<float>(this->size);
         point = rotate_vector(cube::deviation, { 1, 0, 0 }, point);
         point = rotate_vector(cube::deviation, { 0, 0, 1 }, point);
     }

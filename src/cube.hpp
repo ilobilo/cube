@@ -5,6 +5,8 @@
 #include <glm/glm.hpp>
 #include <term.hpp>
 
+#include <utility>
+
 struct cube
 {
     static inline constexpr ssize_t nx_chars = 2;
@@ -21,13 +23,29 @@ struct cube
         { 0, 0, 0 }
     };
 
-    terminal term;
+    static inline constexpr glm::vec3 default_verticies[8]
+    {
+        { -1, -1,  1 },
+        {  1, -1,  1 },
+        {  1,  1,  1 },
+        { -1,  1,  1 },
+        { -1, -1, -1 },
+        {  1, -1, -1 },
+        {  1,  1, -1 },
+        { -1,  1, -1 }
+    };
 
+    private:
+    terminal term;
     ssize_t size;
+
     glm::vec3 vertices[8];
 
-    void rotate(float deg, glm::vec3 axis);
-    void draw();
+    std::pair<ssize_t, ssize_t> getstarts();
 
-    cube(ssize_t size);
+    public:
+    void rotate(float deg, glm::vec3 axis);
+    bool draw();
+
+    cube(ssize_t size = 0);
 };
