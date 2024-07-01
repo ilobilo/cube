@@ -1,6 +1,4 @@
 .vscode
 .cache
-subprojects/*
-!subprojects/*.wrap
-
-build*
+.xmake
+build
