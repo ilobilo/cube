@@ -1,5 +1,5 @@
 add_rules("mode.release")
-add_rules("plugin.compile_commands.autoupdate", { outputdir = "build" })
+add_rules("plugin.compile_commands.autoupdate", { outputdir = "$(buildir)" })
 
 add_requires("glm")
 add_requires("ncursesw")
