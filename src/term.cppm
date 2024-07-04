@@ -1,17 +1,15 @@
 // Copyright (C) 2024 ilobilo
 
-#pragma once
+module;
 
 #include <ncurses.h>
 
-#include <type_traits>
-#include <locale>
+export module term;
+import std;
 
-#include <cstddef>
+export using ssize_t = std::make_signed_t<std::size_t>;
 
-using ssize_t = std::make_signed_t<std::size_t>;
-
-struct terminal
+export struct terminal
 {
     terminal()
     {

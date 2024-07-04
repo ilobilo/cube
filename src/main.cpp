@@ -1,12 +1,7 @@
 // Copyright (C) 2024 ilobilo
 
-#include <cstdlib>
-#include <csignal>
-
-#include <cube.hpp>
-
-#include <thread>
-#include <chrono>
+import cube;
+import std;
 
 auto main() -> int
 {
@@ -20,5 +15,5 @@ auto main() -> int
         std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 15));
     }
 
-    return EXIT_SUCCESS;
+    return 0;
 }
