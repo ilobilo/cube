@@ -26,10 +26,7 @@ struct terminal
         refresh();
     }
 
-    ~terminal()
-    {
-        endwin();
-    }
+    ~terminal() { endwin(); }
 
     ssize_t width() { return COLS; }
     ssize_t height() { return LINES; }
@@ -40,10 +37,5 @@ struct terminal
     void printoff(std::size_t xoff, std::size_t yoff, const char *str)
     {
         mvprintw(yoff, xoff, "%s", str);
-    }
-
-    void putoff(std::size_t xoff, std::size_t yoff, char ch)
-    {
-        mvaddch(yoff, xoff, ch);
     }
 };

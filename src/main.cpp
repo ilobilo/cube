@@ -1,8 +1,5 @@
 // Copyright (C) 2024 ilobilo
 
-#include <cstdlib>
-#include <csignal>
-
 #include <cube.hpp>
 
 #include <thread>
@@ -10,14 +7,17 @@
 
 auto main() -> int
 {
-    cube cube { };
+    using namespace std::chrono_literals;
 
-    volatile bool should_run = true;
-    while (should_run)
+    cube cube { };
+    cube.rotate(-15, { 1, 0, 0 });
+    cube.rotate(-15, { 0, 0, 1 });
+
+    while (true)
     {
         cube.rotate(-10, { 0, 1, 0 });
         cube.draw();
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 15));
+        std::this_thread::sleep_for(1000ms / 15);
     }
 
     return EXIT_SUCCESS;
