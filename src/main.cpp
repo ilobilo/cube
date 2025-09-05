@@ -11,13 +11,13 @@ auto main() -> int
 
     cube cube { };
     cube.rotate(-15, { 1, 0, 0 });
-    cube.rotate(-15, { 0, 0, 1 });
+    cube.rotate(-10, { 0, 0, 1 });
 
     while (true)
     {
-        cube.rotate(-10, { 0, 1, 0 });
+        cube.rotate(-3.5f, { 0, 1, 0 });
         cube.draw();
-        std::this_thread::sleep_for(1000ms / 15);
+        std::this_thread::sleep_for(1000ms / 30);
     }
 
     return EXIT_SUCCESS;
